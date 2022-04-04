@@ -1,21 +1,18 @@
 grammar MyGrammar;
 
 /** The start rule; begin parsing here. */
-prog: stat+;
+prog: (expr ';')+;
 
-stat: expr NEWLINE         
-	| ID '=' expr NEWLINE  
-    | NEWLINE              
-    ;
-
-expr: expr ('*'|'/') expr  
-    | expr ('+'|'-') expr  
-    | INT                  
-    | ID 
-    | '(' expr ')' 
+expr: expr op=('*'|'/') expr    # mul
+    | expr op=('+'|'-') expr    # add
+    | INT                       # int
+    | OCT                       # oct
+    | HEXA                      # hexa
+    | '(' expr ')'              # par
     ;
 
 ID : [a-zA-Z]+ ;        // match identifiers
-INT : [0-9]+ ;          // match integers
-NEWLINE:'\r'? '\n' ;    // return newlines to parser (is end-statement signal)
-WS : [ \t]+ -> skip ;   // toss out whitespace
+INT : [1-9][0-9]* ;          // match integers
+OCT : '0'[0-7]* ;
+HEXA : '0x'[0-9a-fA-F]+ ;
+WS : [ \t\r\n]+ -> skip ;   // toss out whitespace

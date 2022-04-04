@@ -1,20 +1,36 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using System.Globalization;
 
 namespace PJP_project_ANTLR_parser
 {
     internal class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            var inputFile = new StreamReader("input1.txt");
-            AntlrInputStream stream = new AntlrInputStream(inputFile);
-            ITokenSource lexer = new MyGrammarLexer(stream);
-            ITokenStream tokens = new CommonTokenStream(lexer);
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+            var fileName = "input1.txt";
+            Console.WriteLine("Parsing: " + fileName);
+            var inputFile = new StreamReader(fileName);
+            AntlrInputStream input = new AntlrInputStream(inputFile);
+            MyGrammarLexer lexer = new MyGrammarLexer(input);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
             MyGrammarParser parser = new MyGrammarParser(tokens);
-            parser.BuildParseTree = true;
+
+            parser.AddErrorListener(new VerboseErrorListener());
+
             IParseTree tree = parser.prog();
-            Console.WriteLine(tree.ToStringTree(parser));
+
+            if (parser.NumberOfSyntaxErrors == 0)
+            {
+                //Console.WriteLine(tree.ToStringTree(parser));
+
+                var result = new EvalVisitor().Visit(tree);
+                Console.WriteLine(result);
+
+                VirtualMachine virtualMachine = new VirtualMachine(result);
+                virtualMachine.Run();
+            }
         }
     }
 }
