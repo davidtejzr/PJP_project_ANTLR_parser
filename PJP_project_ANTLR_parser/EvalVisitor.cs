@@ -24,6 +24,16 @@ namespace PJP_project_ANTLR_parser
             var value = Convert.ToInt32(context.OCT().GetText(), 8);
             return $"PUSH {value}\n";
         }
+        public override string VisitFloat([NotNull] MyGrammarParser.FloatContext context)
+        {
+            var value = Convert.ToDecimal(context.FLOAT().GetText());
+            return $"PUSH {value}\n";
+        }
+        public override string VisitString([NotNull] MyGrammarParser.StringContext context)
+        {
+            var value = context.STRING().GetText();
+            return $"PUSH {value}\n";
+        }
         public override string VisitPar([NotNull] MyGrammarParser.ParContext context)
         {
             return Visit(context.expr());
@@ -57,13 +67,18 @@ namespace PJP_project_ANTLR_parser
         public override string VisitProg([NotNull] MyGrammarParser.ProgContext context)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var expr in context.expr())
+            foreach (var expr in context.statement())
             {
                 var code = Visit(expr);
                 sb.Append(code);
                 sb.AppendLine("PRINT");
             }
             return sb.ToString();
+        }
+        public override string VisitIdentifier([NotNull] MyGrammarParser.IdentifierContext context)
+        {
+            var value = context.IDENTIFIER().GetText();
+            return value;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace PJP_project_ANTLR_parser
         public static void Main(string[] args)
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-            var fileName = "input1.txt";
+            var fileName = "input2.txt";
             Console.WriteLine("Parsing: " + fileName);
             var inputFile = new StreamReader(fileName);
             AntlrInputStream input = new AntlrInputStream(inputFile);
@@ -23,8 +23,6 @@ namespace PJP_project_ANTLR_parser
 
             if (parser.NumberOfSyntaxErrors == 0)
             {
-                //Console.WriteLine(tree.ToStringTree(parser));
-
                 var result = new EvalVisitor().Visit(tree);
                 Console.WriteLine(result);
 
