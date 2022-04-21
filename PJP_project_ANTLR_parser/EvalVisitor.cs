@@ -9,29 +9,9 @@ namespace PJP_project_ANTLR_parser
 {
     public class EvalVisitor : MyGrammarBaseVisitor<string>
     {
-        public override string VisitInt([NotNull] MyGrammarParser.IntContext context)
+        public override string VisitConstant([NotNull] MyGrammarParser.ConstantContext context)
         {
-            var value = Convert.ToInt32(context.INT().GetText(), 10);
-            return $"PUSH {value}\n";
-        }
-        public override string VisitHexa([NotNull] MyGrammarParser.HexaContext context)
-        {
-            var value = Convert.ToInt32(context.HEXA().GetText(), 16);
-            return $"PUSH {value}\n";
-        }
-        public override string VisitOct([NotNull] MyGrammarParser.OctContext context)
-        {
-            var value = Convert.ToInt32(context.OCT().GetText(), 8);
-            return $"PUSH {value}\n";
-        }
-        public override string VisitFloat([NotNull] MyGrammarParser.FloatContext context)
-        {
-            var value = Convert.ToDecimal(context.FLOAT().GetText());
-            return $"PUSH {value}\n";
-        }
-        public override string VisitString([NotNull] MyGrammarParser.StringContext context)
-        {
-            var value = context.STRING().GetText();
+            var value = Convert.ToInt32(context.CONSTANT().GetText(), 10);
             return $"PUSH {value}\n";
         }
         public override string VisitPar([NotNull] MyGrammarParser.ParContext context)
@@ -67,7 +47,7 @@ namespace PJP_project_ANTLR_parser
         public override string VisitProg([NotNull] MyGrammarParser.ProgContext context)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var expr in context.statement())
+            foreach (var expr in context.line())
             {
                 var code = Visit(expr);
                 sb.Append(code);
@@ -78,6 +58,13 @@ namespace PJP_project_ANTLR_parser
         public override string VisitIdentifier([NotNull] MyGrammarParser.IdentifierContext context)
         {
             var value = context.IDENTIFIER().GetText();
+            return value;
+        }
+
+        public override string VisitConcat([NotNull] MyGrammarParser.ConcatContext context)
+        {
+            //var value = context.IDENTIFIER().GetText();
+            var value = "v";
             return value;
         }
     }

@@ -1,37 +1,53 @@
 grammar MyGrammar;
 
 /** The start rule; begin parsing here. */
-prog: statement + EOF;
+prog: line*;
 
-statement
-    : (expr ';')
-    | DATATYPE IDENTIFIER ((',' IDENTIFIER)*)? ('=' expr)? ';'
-    | IDENTIFIER (('='IDENTIFIER)*)?'=' expr ';' 
-    | 'read' IDENTIFIER (',' IDENTIFIER)* ';'
-    | 'write' expr (',' expr )* ';'
+line
+    : statement ';'
+    /**| print ';'*/
+    | read ';'
+    | COMMENT
     | ';'
     ;
 
-expr
-    : IDENTIFIER                # identifier
-    | expr op=('*'|'/') expr    # mul
-    | expr op=('+'|'-') expr    # add
-    | INT                       # int
-    | FLOAT                     # float
-    | OCT                       # oct
-    | HEXA                      # hexa
-    | STRING                    # string
-    | '(' expr ')'              # par
+statement
+    : declaration
+    | assignment 
+    | expr
     ;
 
+read : 'read' ID (',' ID)* ;
+print : 'write' (formated)+ ;
+formated : STRING(',' expr ',')*(',' expr)* ;
 
+declaration
+    : DATATYPE IDENTIFIER (',' IDENTIFIER)*
+    ;
+
+assignment
+    : expr
+    | IDENTIFIER '=' assignment
+    ;
+
+expr
+    : CONSTANT                      # constant
+    | IDENTIFIER                    # identifier
+    | expr op=('*'|'/'|'%') expr    # mul
+    | expr op=('+'|'-') expr        # add
+    | STRING ('.') STRING           # concat
+    | '(' expr ')'                  # par
+    ;
+
+CONSTANT : INT | FLOAT | BOOL | STRING ;
 DATATYPE : 'int' | 'string' | 'float' | 'bool' ;
-ID : [a-zA-Z]+ ;
-INT : [1-9][0-9]* ;
-FLOAT : [0-9]+ '.' [0-9]+ ;
-OCT : '0'[0-7]* ;
-HEXA : '0x'[0-9a-fA-F]+ ;
+IDENTIFIER : [a-zA-Z]+ ;
+
+INT : ('-')?[1-9][0-9]* ;
+FLOAT : ('-')?[0-9]+ '.' [0-9]+ ;
+BOOL : 'true' | 'false' ;
 STRING : ('"' ~'"'* '"') | ( '\'' ~'\''* '\'') ;
 
+
 WS : [ \t\r\n]+ -> skip ;
-IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]* ;
+COMMENT : '//' ~( '\r' | '\n' )* -> skip;

@@ -17,7 +17,7 @@ namespace PJP_project_ANTLR_parser
 
         public void Run()
         {
-            foreach(var instruction in code)
+            /*foreach(var instruction in code)
             {
                 if(instruction.StartsWith("PRINT"))
                 {
@@ -43,7 +43,7 @@ namespace PJP_project_ANTLR_parser
                     };
                     stack.Push(result);
                 }
-            }
+            }*/
         }
     }
 }
