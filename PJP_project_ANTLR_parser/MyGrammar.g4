@@ -5,10 +5,10 @@ prog: line*;
 
 line
     : statement ';'
-    /**| print ';'*/
+    | write ';'
     | read ';'
-    | COMMENT
     | ';'
+    | COMMENT
     ;
 
 statement
@@ -17,11 +17,7 @@ statement
     | expr
     ;
 
-read : 'read' ID (',' ID)* ;
-print : 'write' (formated)+ ;
-formated : STRING(',' expr ',')*(',' expr)* ;
-
-declaration
+    declaration
     : DATATYPE IDENTIFIER (',' IDENTIFIER)*
     ;
 
@@ -30,8 +26,23 @@ assignment
     | IDENTIFIER '=' assignment
     ;
 
+write
+    : 'write' (formatedWrite)+
+    ;
+
+formatedWrite
+    : STRING(',' expr ',')*(',' expr)*
+    ;
+
+read
+    : 'read' IDENTIFIER (',' IDENTIFIER)*
+    ;
+
 expr
-    : CONSTANT                      # constant
+    : INT                           # int
+    | FLOAT                         # float
+    | BOOL                          # bool
+    | STRING                        # string
     | IDENTIFIER                    # identifier
     | expr op=('*'|'/'|'%') expr    # mul
     | expr op=('+'|'-') expr        # add
@@ -39,15 +50,13 @@ expr
     | '(' expr ')'                  # par
     ;
 
-CONSTANT : INT | FLOAT | BOOL | STRING ;
 DATATYPE : 'int' | 'string' | 'float' | 'bool' ;
 IDENTIFIER : [a-zA-Z]+ ;
 
 INT : ('-')?[1-9][0-9]* ;
 FLOAT : ('-')?[0-9]+ '.' [0-9]+ ;
 BOOL : 'true' | 'false' ;
-STRING : ('"' ~'"'* '"') | ( '\'' ~'\''* '\'') ;
-
+STRING : ('"' ~'"'* '"') ;
 
 WS : [ \t\r\n]+ -> skip ;
 COMMENT : '//' ~( '\r' | '\n' )* -> skip;

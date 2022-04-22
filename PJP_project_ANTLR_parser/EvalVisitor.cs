@@ -7,16 +7,68 @@ using System.Threading.Tasks;
 
 namespace PJP_project_ANTLR_parser
 {
+    /*public struct Data
+    {
+        public string DataType;
+        public string Value;
+    }*/
+
     public class EvalVisitor : MyGrammarBaseVisitor<string>
     {
-        public override string VisitConstant([NotNull] MyGrammarParser.ConstantContext context)
+        StringBuilder sb = new StringBuilder();
+        public override string VisitProg([NotNull] MyGrammarParser.ProgContext context)
         {
-            var value = Convert.ToInt32(context.CONSTANT().GetText(), 10);
-            return $"PUSH {value}\n";
+            foreach (var expr in context.line())
+            {
+                var code = Visit(expr);
+            }
+            //Data data = new Data();
+            //data.Value = sb.ToString();
+            //return data;
+            return sb.ToString();
+        }
+
+        public override string VisitFormatedWrite([NotNull] MyGrammarParser.FormatedWriteContext context)
+        {
+            int exprCount = 0;
+            foreach(var item in context.children)
+            {
+                if (item.GetText() == ",")
+                    break;
+
+                sb.AppendLine("push S " + item);
+
+                exprCount = context.expr().Length;
+                for (int i = 0; i < exprCount; i++)
+                {
+                    var result = Visit(context.expr(0));
+                    var dd = result.GetTypeCode();
+                    sb.AppendLine("push " + result);
+                }
+            }
+
+            sb.AppendLine("print " + ++exprCount);
+            return "";
+        }
+
+        public override string VisitInt([NotNull] MyGrammarParser.IntContext context)
+        {
+            var value = Convert.ToInt32(context.INT().GetText());
+            return "I " + value.ToString();
+        }
+        public override string VisitFloat([NotNull] MyGrammarParser.FloatContext context)
+        {
+            var value = Convert.ToDecimal(context.FLOAT().GetText());
+            return "F " + value.ToString();
         }
         public override string VisitPar([NotNull] MyGrammarParser.ParContext context)
         {
             return Visit(context.expr());
+        }
+        public override string VisitAssignment([NotNull] MyGrammarParser.AssignmentContext context)
+        {
+            var koko = context.assignment();
+            return koko.ToString();
         }
         public override string VisitAdd([NotNull] MyGrammarParser.AddContext context)
         {
@@ -44,20 +96,10 @@ namespace PJP_project_ANTLR_parser
                 return left + right + "DIV\n";
             }
         }
-        public override string VisitProg([NotNull] MyGrammarParser.ProgContext context)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var expr in context.line())
-            {
-                var code = Visit(expr);
-                sb.Append(code);
-                sb.AppendLine("PRINT");
-            }
-            return sb.ToString();
-        }
         public override string VisitIdentifier([NotNull] MyGrammarParser.IdentifierContext context)
         {
-            var value = context.IDENTIFIER().GetText();
+            //var value = context.IDENTIFIER().GetText();
+            var value = "test";
             return value;
         }
 

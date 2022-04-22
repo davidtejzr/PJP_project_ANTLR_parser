@@ -12,7 +12,7 @@ namespace PJP_project_ANTLR_parser
         Stack<int> stack = new Stack<int> ();
         public VirtualMachine(string code)
         {
-            this.code = code.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+            //this.code = code.Split("\n\r".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
         public void Run()
