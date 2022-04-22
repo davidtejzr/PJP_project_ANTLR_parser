@@ -27,10 +27,10 @@ assignment
     ;
 
 write
-    : 'write' (formatedWrite)+
+    : 'write' (writePart)+
     ;
 
-formatedWrite
+writePart
     : STRING(',' expr ',')*(',' expr)*
     ;
 
