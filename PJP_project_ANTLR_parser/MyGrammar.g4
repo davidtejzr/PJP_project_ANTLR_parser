@@ -17,7 +17,7 @@ statement
     | expr
     ;
 
-    declaration
+declaration
     : DATATYPE IDENTIFIER (',' IDENTIFIER)*
     ;
 

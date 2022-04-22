@@ -20,5 +20,14 @@ namespace PJP_project_ANTLR_parser
             Console.Error.WriteLine("line " + line + ":" + charPositionInLine + " at " + offendingSymbol + ": " + msg);
        }
 
+        public void datatypeUnknownError(string datatype)
+        {
+            Console.Error.WriteLine("datatype '" + datatype + "' unknown");
+        }
+        public void variableNotexistError(string variable)
+        {
+            Console.Error.WriteLine("variable '" + variable + "' not exist");
+        }
+
     }
 }

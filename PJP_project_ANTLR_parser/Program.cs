@@ -9,7 +9,7 @@ namespace PJP_project_ANTLR_parser
         public static void Main(string[] args)
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-            var fileName = "input2.txt";
+            var fileName = "input1.txt";
             Console.WriteLine("Parsing: " + fileName);
             var inputFile = new StreamReader(fileName);
             AntlrInputStream input = new AntlrInputStream(inputFile);
@@ -24,9 +24,9 @@ namespace PJP_project_ANTLR_parser
             if (parser.NumberOfSyntaxErrors == 0)
             {
                 var result = new EvalVisitor().Visit(tree);
-                Console.WriteLine(result);
+                Console.WriteLine(result.Value);
 
-                VirtualMachine virtualMachine = new VirtualMachine(result);
+                VirtualMachine virtualMachine = new VirtualMachine(result.Value);
                 virtualMachine.Run();
             }
         }
