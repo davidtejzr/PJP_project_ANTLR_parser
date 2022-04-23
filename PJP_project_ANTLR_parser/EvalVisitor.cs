@@ -152,7 +152,8 @@ namespace PJP_project_ANTLR_parser
                     //sb.AppendLine("save " + context.children[1].ToString());
                     //variables[data.DataType] = context.children[1].ToString();
                     sb.AppendLine("save " + child.ToString());
-                    variables[data.DataType] = child.ToString();
+                    //variables[data.DataType] = child.ToString();
+                    variables[child.ToString()] = data.DataType;
                 }
             }
 
@@ -174,53 +175,68 @@ namespace PJP_project_ANTLR_parser
 
             if (context.children[0] != null)
             {
-                if (variables.ContainsValue(context.children[0].ToString()))
-                {
-                    string searchValue = null;
-                    if (context.children[2].GetChild(0).GetChild(0) != null)
-                        searchValue = context.children[2].GetChild(0).GetChild(0).ToString();
-                    var searchType = variables.FirstOrDefault(x => x.Value == context.children[0].ToString()).Key;
-
-                    //kontrola zapornych hodnot
-                    if ((searchType == "I") && (searchValue != null) && (int.Parse(searchValue) < 0))
+                //foreach (var child in context.children)
+                //{
+                    if (variables.ContainsKey(context.children[0].ToString()))
                     {
-                        int val = int.Parse(searchValue);
-                        val *= -1;
-                        searchValue = val.ToString();
-                        isUminus = true;
+                        string searchValue = null;
+           
+                        if (context.children[2].GetChild(0).GetChild(0) != null)
+                            searchValue = context.children[2].GetChild(0).GetChild(0).ToString();
+                        var searchType = variables[context.children[0].ToString()];
+
+                        //kontrola zapornych hodnot
+                        if ((searchType == "I") && (searchValue != null))
+                        {
+                            int result;
+                            int.TryParse(searchValue, out result);
+                            if(result < 0)
+                            {
+                                int val = int.Parse(searchValue);
+                                val *= -1;
+                                searchValue = val.ToString();
+                                isUminus = true;
+                            }
+                        }
+                        
+                        if ((searchType == "F") && (searchValue != null))
+                        {
+                            float result;
+                            float.TryParse(searchValue, out result);
+                            if (result < 0)
+                            {
+                                int val = int.Parse(searchValue);
+                                val *= -1;
+                                searchValue = val.ToString();
+                                isUminus = true;
+                            }
+                        }
+
+                        /*if((value.DataType == "I") && (searchType == "F"))
+                        {
+                            searchType = "I";
+                            searchValue = int.Parse(searchValue).ToString();  
+                            isItof = true;
+                        }*/
+
+                        data.DataType = searchType;
+                        data.Value = searchValue;
+                        sb.AppendLine("push " + searchType + " " + searchValue);
+
+                        if (isItof)
+                            sb.AppendLine("itof");
+
+                        if (isUminus)
+                            sb.AppendLine("uminus");
+
+                        values[context.children[0].ToString()] = searchValue;
+                        sb.AppendLine("save " + context.children[0].ToString());
+                        sb.AppendLine("load " + context.children[0].ToString());
                     }
-                    else if ((searchType == "F") && (searchValue != null) && (float.Parse(searchValue) < 0))
-                    {
-                        float val = float.Parse(searchValue);
-                        val *= -1;
-                        searchValue = val.ToString();
-                        isUminus = true;
-                    }
-
-                    /*if((value.DataType == "I") && (searchType == "F"))
-                    {
-                        searchType = "I";
-                        searchValue = int.Parse(searchValue).ToString();  
-                        isItof = true;
-                    }*/
-
-                    data.DataType = searchType;
-                    data.Value = searchValue;
-                    sb.AppendLine("push " + searchType + " " + searchValue);
-
-                    if (isItof)
-                        sb.AppendLine("itof");
-
-                    if (isUminus)
-                        sb.AppendLine("uminus");
-
-                    values[context.children[0].ToString()] = searchValue;
-                    sb.AppendLine("save " + context.children[0].ToString());
-                    sb.AppendLine("load " + context.children[0].ToString());
-                    sb.AppendLine("pop");
-                }
-                else
-                    err.variableNotexistError(context.children[0].ToString());
+                    else
+                        err.variableNotexistError(context.children[0].ToString());
+                //}
+                //sb.AppendLine("pop");
             }
 
             return data;
