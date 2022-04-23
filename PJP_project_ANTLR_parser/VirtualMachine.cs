@@ -26,7 +26,19 @@ namespace PJP_project_ANTLR_parser
         {
             foreach(var instruction in code)
             {
-                var data = instruction.Split(" ");
+                //var data = instruction.Split(" ");
+                string[] data;
+                if(instruction.Contains("\""))
+                {
+                    var tmp = instruction.Split("\"");
+                    data = tmp[0].Split(" ");
+                    data[data.Length - 1] = "\t" + tmp[1];
+                }
+                else
+                {
+                    data = instruction.Split(" ");
+                }
+
                 //var ins = instruction.Replace("\"", " '");
                 //var data = Regex.Split(ins, @"\s+(?=[^']* (?:'[^']*'[^']*)*$)");
 
@@ -64,7 +76,7 @@ namespace PJP_project_ANTLR_parser
         {
             for(int i = 0; i < int.Parse(count); i++)
             {
-                //Console.WriteLine(stack.Pop().Value);
+                Console.WriteLine(stack.Pop().Value);
             }
         }
 

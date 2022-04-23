@@ -74,9 +74,10 @@ namespace PJP_project_ANTLR_parser
                 if (item.GetText() == ",")
                     break;
 
-                if (variables.ContainsValue(item.ToString()))
+                if (variables.ContainsKey(item.ToString()))
                 {
-                    var searchType = variables.FirstOrDefault(x => x.Value == item.ToString()).Key;
+                    var searchType = variables[item.ToString()];
+                    //var searchType = variables.FirstOrDefault(x => x.Value == item.ToString()).Key;
                     sb.AppendLine("read " + searchType);
                     sb.AppendLine("save " + item.ToString());
                 }
@@ -85,6 +86,19 @@ namespace PJP_project_ANTLR_parser
             }
             return data;
         }
+
+        /*public override Data VisitStatement([NotNull] MyGrammarParser.StatementContext context)
+        {
+            if(context.declaration() != null)
+                return VisitDeclaration(context.declaration());
+            else if(context.assignment() != null)
+            {
+                sb.AppendLine("pop");
+                return VisitAssignment(context.assignment());
+            }
+
+            return VisitExpr(context.expr());
+        }*/
 
         public override Data VisitInt([NotNull] MyGrammarParser.IntContext context)
         {
@@ -103,7 +117,7 @@ namespace PJP_project_ANTLR_parser
         public override Data VisitBool([NotNull] MyGrammarParser.BoolContext context)
         {
             Data data = new Data();
-            data.Value = Convert.ToBoolean(context.BOOL()).ToString();
+            data.Value = bool.Parse(context.BOOL().ToString()).ToString();
             data.DataType = "B";
             return data;
         }
@@ -149,10 +163,7 @@ namespace PJP_project_ANTLR_parser
                         err.datatypeUnknownError(context.children[0].ToString());
 
                     sb.AppendLine("push " + data.DataType + " " + data.Value.ToString());
-                    //sb.AppendLine("save " + context.children[1].ToString());
-                    //variables[data.DataType] = context.children[1].ToString();
                     sb.AppendLine("save " + child.ToString());
-                    //variables[data.DataType] = child.ToString();
                     variables[child.ToString()] = data.DataType;
                 }
             }
@@ -167,76 +178,73 @@ namespace PJP_project_ANTLR_parser
             bool isItof = false;
 
             //funguje ale robije jine veci
-            /*if (context.expr() != null)
+            if (context.expr() != null)
             {
                 return Visit(context.expr());
             }
-            var value = VisitAssignment(context.assignment());*/
+            var value = VisitAssignment(context.assignment());
 
             if (context.children[0] != null)
             {
-                //foreach (var child in context.children)
-                //{
-                    if (variables.ContainsKey(context.children[0].ToString()))
-                    {
-                        string searchValue = null;
+                if (variables.ContainsKey(context.children[0].ToString()))
+                {
+                    string searchValue = null;
            
-                        if (context.children[2].GetChild(0).GetChild(0) != null)
-                            searchValue = context.children[2].GetChild(0).GetChild(0).ToString();
-                        var searchType = variables[context.children[0].ToString()];
+                    if (context.children[2].GetChild(0).GetChild(0) != null)
+                        searchValue = context.children[2].GetChild(0).GetChild(0).ToString();
+                    var searchType = variables[context.children[0].ToString()];
 
-                        //kontrola zapornych hodnot
-                        if ((searchType == "I") && (searchValue != null))
+                    //kontrola zapornych hodnot
+                    if ((searchType == "I") && (searchValue != null))
+                    {
+                        int result;
+                        int.TryParse(searchValue, out result);
+                        if(result < 0)
                         {
-                            int result;
-                            int.TryParse(searchValue, out result);
-                            if(result < 0)
-                            {
-                                int val = int.Parse(searchValue);
-                                val *= -1;
-                                searchValue = val.ToString();
-                                isUminus = true;
-                            }
+                            int val = int.Parse(searchValue);
+                            val *= -1;
+                            searchValue = val.ToString();
+                            isUminus = true;
                         }
-                        
-                        if ((searchType == "F") && (searchValue != null))
-                        {
-                            float result;
-                            float.TryParse(searchValue, out result);
-                            if (result < 0)
-                            {
-                                int val = int.Parse(searchValue);
-                                val *= -1;
-                                searchValue = val.ToString();
-                                isUminus = true;
-                            }
-                        }
-
-                        /*if((value.DataType == "I") && (searchType == "F"))
-                        {
-                            searchType = "I";
-                            searchValue = int.Parse(searchValue).ToString();  
-                            isItof = true;
-                        }*/
-
-                        data.DataType = searchType;
-                        data.Value = searchValue;
-                        sb.AppendLine("push " + searchType + " " + searchValue);
-
-                        if (isItof)
-                            sb.AppendLine("itof");
-
-                        if (isUminus)
-                            sb.AppendLine("uminus");
-
-                        values[context.children[0].ToString()] = searchValue;
-                        sb.AppendLine("save " + context.children[0].ToString());
-                        sb.AppendLine("load " + context.children[0].ToString());
                     }
-                    else
-                        err.variableNotexistError(context.children[0].ToString());
-                //}
-                //sb.AppendLine("pop");
+                        
+                    if ((searchType == "F") && (searchValue != null))
+                    {
+                        float result;
+                        float.TryParse(searchValue, out result);
+                        if (result < 0)
+                        {
+                            int val = int.Parse(searchValue);
+                            val *= -1;
+                            searchValue = val.ToString();
+                            isUminus = true;
+                        }
+                    }
+
+                    if((value.DataType == "I") && (searchType == "F"))
+                    {
+                        searchType = "I";
+                        searchValue = int.Parse(searchValue).ToString();  
+                        isItof = true;
+                    }
+
+                    data.DataType = searchType;
+                    data.Value = searchValue;
+                    sb.AppendLine("push " + searchType + " " + searchValue);
+
+                    if (isItof)
+                        sb.AppendLine("itof");
+
+                    if (isUminus)
+                        sb.AppendLine("uminus");
+
+                    values[context.children[0].ToString()] = searchValue;
+                    sb.AppendLine("save " + context.children[0].ToString());
+                    sb.AppendLine("load " + context.children[0].ToString());
+                    sb.AppendLine("pop");
+                }
+                else
+                    err.variableNotexistError(context.children[0].ToString());
             }
 
             return data;

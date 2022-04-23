@@ -51,12 +51,12 @@ expr
     ;
 
 DATATYPE : 'int' | 'string' | 'float' | 'bool' ;
-IDENTIFIER : [a-zA-Z]+ ;
 
 INT : ('-')?[1-9][0-9]* ;
 FLOAT : ('-')?[0-9]+ '.' [0-9]+ ;
 BOOL : 'true' | 'false' ;
 STRING : ('"' ~'"'* '"') ;
+IDENTIFIER : [a-zA-Z]+ ;
 
 WS : [ \t\r\n]+ -> skip ;
 COMMENT : '//' ~( '\r' | '\n' )* -> skip;
