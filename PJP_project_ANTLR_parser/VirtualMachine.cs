@@ -39,9 +39,6 @@ namespace PJP_project_ANTLR_parser
                     data = instruction.Split(" ");
                 }
 
-                //var ins = instruction.Replace("\"", " '");
-                //var data = Regex.Split(ins, @"\s+(?=[^']* (?:'[^']*'[^']*)*$)");
-
                 switch (data[0])
                 {
                     case "print":
@@ -64,6 +61,24 @@ namespace PJP_project_ANTLR_parser
                         break;
                     case "mod":
                         calc("%");
+                        break;
+                    case "lt":
+                        compare("<");
+                        break;
+                    case "gt":
+                        compare(">");
+                        break;
+                    case "eq":
+                        compare("==");
+                        break;
+                    /*case "not":
+                        compare("!=");
+                        break;*/
+                    case "or":
+                        logic("||");
+                        break;
+                    case "and":
+                        logic("&&");
                         break;
 
                     default:
@@ -122,6 +137,80 @@ namespace PJP_project_ANTLR_parser
                 }
                 stack.Push(md);
             }
+        }
+
+        public void compare(string comp)
+        {
+            MachineData md = new MachineData();
+            var right = stack.Pop();
+            var left = stack.Pop();
+
+            if(comp == "<")
+            {
+                if (((left.DataType == "I") || (left.DataType == "F")) && ((right.DataType == "I") || (right.DataType == "F")))
+                {
+                    if (float.Parse(left.Value) < float.Parse(right.Value))
+                        md.Value = "True";
+                    else
+                        md.Value = "False";
+                }
+            }
+            else if(comp == ">")
+            {
+                if (((left.DataType == "I") || (left.DataType == "F")) && ((right.DataType == "I") || (right.DataType == "F")))
+                {
+                    if (float.Parse(left.Value) > float.Parse(right.Value))
+                        md.Value = "True";
+                    else
+                        md.Value = "False";
+                }
+            }
+            else if(comp == "==")
+            {
+                if (left.Value == right.Value)
+                    md.Value = "True";
+                else
+                    md.Value = "False";
+            }
+            else if (comp == "!=")
+            {
+                if (left.Value != right.Value)
+                    md.Value = "True";
+                else
+                    md.Value = "False";
+            }
+
+            stack.Push(md);
+        }
+
+        public void logic(string log)
+        {
+            MachineData md = new MachineData();
+            var right = stack.Pop();
+            var left = stack.Pop();
+
+            if (log == "||")
+            {
+                if ((left.DataType == "B") && (right.DataType == "B"))
+                {
+                    if ((bool.Parse(left.Value)) || (bool.Parse(right.Value)))
+                        md.Value = "True";
+                    else
+                        md.Value = "False";
+                }
+            }
+            else if (log == "&&")
+            {
+                if ((left.DataType == "B") && (right.DataType == "B"))
+                {
+                    if ((bool.Parse(left.Value)) && (bool.Parse(right.Value)))
+                        md.Value = "True";
+                    else
+                        md.Value = "False";
+                }
+            }
+
+            stack.Push(md);
         }
     }
 }

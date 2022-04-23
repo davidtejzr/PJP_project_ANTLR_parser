@@ -39,15 +39,18 @@ read
     ;
 
 expr
-    : INT                           # int
-    | FLOAT                         # float
-    | BOOL                          # bool
-    | STRING                        # string
-    | IDENTIFIER                    # identifier
-    | expr op=('*'|'/'|'%') expr    # mul
-    | expr op=('+'|'-') expr        # add
-    | STRING ('.') STRING           # concat
-    | '(' expr ')'                  # par
+    : INT                                   # int
+    | FLOAT                                 # float
+    | BOOL                                  # bool
+    | STRING                                # string
+    | IDENTIFIER                            # identifier
+    | expr op=('*'|'/'|'%') expr            # mul
+    | expr op=('+'|'-') expr                # add
+    | STRING ('.') STRING                   # concat
+    | '(' expr ')'                          # par
+    | '!(' expr ')'                         # not
+    | expr comp=('<'|'>'|'=='|'!=') expr    # comp
+    | expr log=('||'|'&&') expr             # log
     ;
 
 DATATYPE : 'int' | 'string' | 'float' | 'bool' ;

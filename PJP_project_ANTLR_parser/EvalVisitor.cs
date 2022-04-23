@@ -58,7 +58,7 @@ namespace PJP_project_ANTLR_parser
             if (context.expr(0) != null)
             {
                 var result = Visit(context.expr()[0]);
-                if ((result.DataType == "I") || (result.DataType == "F") || (result.DataType == "B"))
+                if ((result.DataType == "I") || (result.DataType == "F") || (result.DataType == "B") || (result.DataType == "S"))
                     sb.AppendLine("push " + result.DataType + " " + result.Value);
                 exprCount++;
             }
@@ -119,6 +119,13 @@ namespace PJP_project_ANTLR_parser
             Data data = new Data();
             data.Value = bool.Parse(context.BOOL().ToString()).ToString();
             data.DataType = "B";
+            return data;
+        }
+        public override Data VisitString([NotNull] MyGrammarParser.StringContext context)
+        {
+            Data data = new Data();
+            data.Value = context.STRING().ToString();
+            data.DataType = "S";
             return data;
         }
         public override Data VisitPar([NotNull] MyGrammarParser.ParContext context)
@@ -302,6 +309,73 @@ namespace PJP_project_ANTLR_parser
             {
                 data.Value = left.ToString() + right.ToString() + "DIV\n";
                 sb.AppendLine("div");
+            }
+
+            return data;
+        }
+        public override Data VisitComp([NotNull] MyGrammarParser.CompContext context)
+        {
+            Data data = new Data();
+            var left = Visit(context.expr()[0]);
+            var right = Visit(context.expr()[1]);
+
+            if ((left.DataType != null) && (left.Value != null))
+            {
+                sb.AppendLine("push " + left.DataType + " " + left.Value.ToString());
+                if ((left.DataType == "I") && (right.DataType == "F"))
+                    sb.AppendLine("itof");
+            }
+            if ((right.DataType != null) && (right.Value != null))
+            {
+                sb.AppendLine("push " + right.DataType + " " + right.Value.ToString());
+                if ((left.DataType == "F") && (right.DataType == "I"))
+                    sb.AppendLine("itof");
+            }
+
+            if (context.comp.Text.Equals("<"))
+            {
+                data.Value = left.ToString() + right.ToString() + "LT\n";
+                sb.AppendLine("lt");
+            }
+            else if (context.comp.Text.Equals(">"))
+            {
+                data.Value = left.ToString() + right.ToString() + "GT\n";
+                sb.AppendLine("gt");
+            }
+            else if (context.comp.Text.Equals("=="))
+            {
+                data.Value = left.ToString() + right.ToString() + "EQ\n";
+                sb.AppendLine("eq");
+            }
+            else
+            {
+                data.Value = left.ToString() + right.ToString() + "EQ NOT\n";
+                sb.AppendLine("eq");
+                sb.AppendLine("not");
+            }
+
+            return data;
+        }
+        public override Data VisitLog([NotNull] MyGrammarParser.LogContext context)
+        {
+            Data data = new Data();
+            var left = Visit(context.expr()[0]);
+            var right = Visit(context.expr()[1]);
+
+            if ((left.DataType != null) && (left.Value != null))
+                sb.AppendLine("push " + left.DataType + " " + left.Value.ToString().ToLower());
+            if ((right.DataType != null) && (right.Value != null))
+                sb.AppendLine("push " + right.DataType + " " + right.Value.ToString().ToLower());
+
+            if (context.log.Text.Equals("||"))
+            {
+                data.Value = left.ToString() + right.ToString() + "OR\n";
+                sb.AppendLine("or");
+            }
+            else if (context.log.Text.Equals("&&"))
+            {
+                data.Value = left.ToString() + right.ToString() + "AND\n";
+                sb.AppendLine("and");
             }
 
             return data;
