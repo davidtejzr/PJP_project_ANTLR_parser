@@ -26,7 +26,6 @@ namespace PJP_project_ANTLR_parser
         {
             foreach(var instruction in code)
             {
-                //var data = instruction.Split(" ");
                 string[] data;
                 if(instruction.Contains("\""))
                 {

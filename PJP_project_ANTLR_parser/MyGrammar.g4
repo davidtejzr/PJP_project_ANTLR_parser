@@ -5,6 +5,8 @@ prog: line*;
 
 line
     : statement ';'
+    | ifBlock
+    | whileBlock
     | write ';'
     | read ';'
     | ';'
@@ -38,6 +40,19 @@ read
     : 'read' IDENTIFIER (',' IDENTIFIER)*
     ;
 
+ifBlock
+    : 'if ('expr')' block ('else' elseIfBlock)*
+    ;
+
+elseIfBlock
+    : block
+    | ifBlock
+    ;
+
+whileBlock
+    : 'while('expr')' block
+    ;
+
 expr
     : INT                                   # int
     | FLOAT                                 # float
@@ -50,12 +65,18 @@ expr
     | '(' expr ')'                          # par
     | '!(' expr ')'                         # not
     | expr comp=('<'|'>'|'=='|'!=') expr    # comp
-    | expr log=('||'|'&&') expr             # log
+    | expr '&&' expr                        # and
+    | expr '||' expr                        # or
+    ;
+
+block
+    : line
+    | '{' line+ '}'
     ;
 
 DATATYPE : 'int' | 'string' | 'float' | 'bool' ;
 
-INT : ('-')?[1-9][0-9]* ;
+INT : ('-')?[1-9]*[0-9]+ ;
 FLOAT : ('-')?[0-9]+ '.' [0-9]+ ;
 BOOL : 'true' | 'false' ;
 STRING : ('"' ~'"'* '"') ;
