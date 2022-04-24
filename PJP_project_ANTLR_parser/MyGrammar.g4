@@ -59,11 +59,11 @@ expr
     | BOOL                                  # bool
     | STRING                                # string
     | IDENTIFIER                            # identifier
+    | '(' expr ')'                          # par
+    | '!(' expr ')'                         # not
     | expr op=('*'|'/'|'%') expr            # mul
     | expr op=('+'|'-') expr                # add
     | STRING ('.') STRING                   # concat
-    | '(' expr ')'                          # par
-    | '!(' expr ')'                         # not
     | expr comp=('<'|'>'|'=='|'!=') expr    # comp
     | expr '&&' expr                        # and
     | expr '||' expr                        # or
